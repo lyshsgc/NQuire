@@ -1,0 +1,2 @@
+== Preview
+NQuire是一款功能强大，配置灵活的自助查询终端设备。NQuire带4.2寸单色液晶显示屏，可以支持触摸屏操作。NQuire的通讯方式灵活，可以配置为以太网（LAN），无线局域网（WIFI），或者广域网（GPRS）等等方式。NQuire的识读引擎也可以配置选用1D，2D，或者RFID。NQuire带有USB host接口，可以支持外插U盘进行数据上传／下载。NQuire还可以通过GPIO驱动外部设备，例如控制闸机。

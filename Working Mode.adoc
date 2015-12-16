@@ -1,0 +1,81 @@
+== NQuire工作模式介绍
+NQuire作为一个智能终端，可以配置在不同模式下工作。改变配置的方法请详见"NQuire配置"章节。
+
+
+=== 服务器－客户端模式
+这是NQuire的典型工作模式。在服务器－客户端模式下，NQuire是一个网络客户端，NQuire将外界触发的事件（如扫描到的条码，用户在触摸屏上的按下位置，等等）通过网络报告给服务器。服务器收到事件，处理后通过网络发送指令给NQuire，这些指令可以指挥NQuire在屏幕上显示／更新信息，或者控制蜂鸣器鸣叫，甚至可以驱动GPIO。 指令格式请详见"NQuire指令介绍"章节。
+
+image::img\001.jpg[]
+
+=== 离线／本地数据库模式
+在离线／本地数据库模式下，NQuire不在将事件通过网络发往服务器，而是在本地数据库里面查找此事件对应的指令。用户需要预定义好事件（例如条码），以及指令列表（例如显示价格），并保存为规定的文本文件格式，并将此文件通过FTP上传或U盘导入到NQuire。
+
+
+目前NQuire离线／本地数据库模式所支持的事件：条码或者RFID成功识读。
+
+IMPORTANT: 要使NQuire工作于离线／本地数据库模式，需要修改cit.inf配置文件：
+
+    /cit/offlinedb/enabled = true
+    /cit/offlinedb/mode = "server fallback"
+    /cit/offlinedb/import_busy_msg = "!"
+    /cit/offlinedb/import_busy_msg_pos = "left-bottom"
+    /cit/offlinedb/failure = "remove"
+    /cit/mode = "offline"
+
+
+如何修改配置文件，请参考"NQuire配置"章节。
+
+==== 如何创建离线数据库
+离线数据库由两个文件组成：barcodes.csv,formats.csv。这两个文件均为CSV格式文件，可以从Excel文件导出，或者手工编辑创建。Barcodes.csv文件至少有两栏，并且能够自定义多栏，方便客户配置。
+
+CAUTION: 第一栏必须被设置为'barcode',第二栏必须被设为'format'。自定义的栏目里的变量可被用于连接format里的变量。如：format1和Code 128。第二栏必须被设为'format'。
+
+自定义的栏目里的变量可被用于连接format里的变量, 如：format1和Code 128。
+在下面的示例中，如果 'Newland' 被扫描，将会显示format1定义的内容
+
+===== this is an example for barcode.csv
+
+
+    barcode,format,code
+    Newland,format1,Code 128
+    China,format2,QR Code
+
+
+====== this is an example for formats.csv
+
+
+    format,response
+    format1,\x1b\x42\x30\x1b\x25\x1b\x2e\x30${barcode}\x03
+    format2,\x1b\x42\x30\x1b\x25\x1b\x2e\x30${barcode}\x03
+
+
+====== Packing
+
+离线数据库必须以zip格式打包，文件名格式为“offlinedb-<user define>-<md5 checksum>.zip”。文件名中的“<user define>”用户可以自定义或者省略。 “<md5 checksum>”部分是32位字符，代表这个文件的MD5哈稀值。
+
+TIP: http://www.winmd5.com[一个免费计算MD5值的软件 ]
+
+
+制作打包文件的参考Makefile：
+
+[source,makefile]
+----
+  $ cat Makefile
+  TMPF:=_tmp.zip
+  CALSUM:=md5sum -b $(TMPF) | cut -b -32
+
+  all: zip sum
+
+  zip:
+  rm -f $(TMPF)
+  zip $(TMPF) barcodes.csv formats.csv
+----
+
+生成参考格式如下： +
+*offlinedb-newland20111020-8b38a1aa2d5ab1dee7a5befe1fbea3cb.zip* +
+*offlinedb-8b38a1aa2d5ab1dee7a5befe1fbea3cb.zip*dalu
+
+
+====== 离线数据库导入
+
+将CIT配置成离线数据库模式(方法见"NQuire配置"章节），将打包好的数据库文件上传到CIT的FTP目录下，CIT就会自动导入此离线数据库。

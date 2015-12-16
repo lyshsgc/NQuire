@@ -1,0 +1,16 @@
+= NQuire Application Programming Manual
+Leo <liuys@nlscan.com>
+v1.0, 2015-12-15
+
+These pages are the application documentation of the NQuire.
+
+These pages are written in asciidoc format (see ...)
+html or pdf code is generated from that.
+
+== Targets
+
+This documentation *should* be minimal but complete (but it is not complete):
+
+ - self-explanatory code is preferred
+ - function headers and file headers are preferred when that documentation does not surpass the scope of that file.
+ - everything else worth noting is or should be described here.
